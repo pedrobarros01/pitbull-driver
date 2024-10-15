@@ -56,47 +56,4 @@ class Driver:
     def close_socket(self):
         self.socket.close()
 
-class App:
-    def __init__(self, root, driver):
-        self.driver = driver
-        
-        # Configurar a janela principal
-        self.root = root
-        self.root.title("Controle de Coils via Modbus")
 
-        # Criar 6 botões para os coils de 0 a 5
-        for i in range(6):
-            button = tk.Button(root, text=f"Pressionar Coil {i}", width=20, height=2, bg="blue", 
-                               command=lambda i=i: self.push_button_action(i))
-            button.pack(pady=10)
-
-    def push_button_action(self, address):
-        if address in [4, 5]:
-            # Para os endereços 4 e 5, inverte a ordem: primeiro envia False, depois True
-            self.driver.send_action_button(address, False)  # Enviar False primeiro
-            # Esperar um curto período e depois enviar True
-            self.root.after(200, lambda: self.driver.send_action_button(address, True))
-        else:
-            # Para os outros endereços, envia True primeiro
-            self.driver.send_action_button(address, True)   
-            # Esperar um curto período e depois enviar False
-            self.root.after(200, lambda: self.driver.send_action_button(address, False))
-
-    def on_closing(self):
-        # Fechar o socket antes de sair
-        self.driver.close_socket()
-        self.root.destroy()
-
-if __name__ == '__main__':
-    # Criar driver para conexão Modbus
-    driver = Driver('192.168.15.1', 502, 1)
-
-    # Criar janela principal do tkinter
-    root = tk.Tk()
-    app = App(root, driver)
-
-    # Detectar o fechamento da janela para encerrar o socket
-    root.protocol("WM_DELETE_WINDOW", app.on_closing)
-
-    # Iniciar a interface gráfica
-    root.mainloop()
