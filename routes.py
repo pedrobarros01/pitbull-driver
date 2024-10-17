@@ -1,9 +1,10 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from driver import Driver
 import asyncio
 from fastapi.middleware.cors import CORSMiddleware
-
-app = FastAPI()
+import uvicorn
+# uvicorn routes:app --host 192.168.64.241 --port 8000
+app = FastAPI(contact='192.168.64.241')
 
 # Configuração do middleware CORS para permitir qualquer origem
 app.add_middleware(
@@ -34,3 +35,11 @@ async def turn_led(id_led: int):
 
     finally:
         driver.close_socket()  # Certifique-se de fechar a conexão
+@app.get('/hello')
+def hello(request: Request):
+    client_host = request.client.host
+    print(client_host)
+    return {'message': 'hello'}
+
+if __name__ == '__main__':
+    uvicorn.run(app, host='192.168.64.241', port=8000)
