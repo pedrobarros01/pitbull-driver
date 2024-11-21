@@ -15,7 +15,7 @@ app.add_middleware(
     allow_headers=["*"],  # Permitir qualquer cabeçalho
 )
 
-@app.get('/led/{id_led}')
+@app.get('/led/on/{id_led}')
 async def turn_led(id_led: int):
     if id_led < 0:
         raise HTTPException(status_code=400, detail="Parâmetro 'id_led' não pode ser menor que 0")
@@ -26,9 +26,45 @@ async def turn_led(id_led: int):
         driver.send_action_button(id_led, True)
         
         await asyncio.sleep(3)  # Função assíncrona não bloqueante
-        
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao controlar o LED: {str(e)}")
+
+    finally:
+        driver.close_socket()  # Certifique-se de fechar a conexão
+
+@app.get('/led/off/{id_led}')
+async def turn_led(id_led: int):
+    if id_led < 0:
+        raise HTTPException(status_code=400, detail="Parâmetro 'id_led' não pode ser menor que 0")
+    
+    try:
+        driver = Driver('192.168.15.1', 502, 1)  # Nova instância para cada request
+                
         print(f"Desligando LED {id_led}")
         driver.send_action_button(id_led, False)
+        
+        await asyncio.sleep(3)  # Função assíncrona não bloqueante
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao controlar o LED: {str(e)}")
+
+    finally:
+        driver.close_socket()  # Certifique-se de fechar a conexão
+
+@app.get('/led/get_state/{id_led}')
+async def turn_led(id_led: int):
+    if id_led < 0:
+        raise HTTPException(status_code=400, detail="Parâmetro 'id_led' não pode ser menor que 0")
+    
+    try:
+        driver = Driver('192.168.15.1', 502, 1)  # Nova instância para cada request
+                
+        print(f"Desligando LED {id_led}")
+        dados = driver.read_coil(id_led)
+        
+        await asyncio.sleep(3)  # Função assíncrona não bloqueante
+        return {'coils': dados}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao controlar o LED: {str(e)}")
