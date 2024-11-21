@@ -3,8 +3,8 @@ from driver import Driver
 import asyncio
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-# uvicorn routes:app --host 192.168.64.241 --port 8000
-app = FastAPI(contact='192.168.64.241')
+# uvicorn routes:app --host 192.168.88.242 --port 8000
+app = FastAPI()
 
 # Configuração do middleware CORS para permitir qualquer origem
 app.add_middleware(
@@ -21,7 +21,7 @@ async def turn_led(id_led: int):
         raise HTTPException(status_code=400, detail="Parâmetro 'id_led' não pode ser menor que 0")
     
     try:
-        driver = Driver('192.168.15.1', 502, 1)  # Nova instância para cada request
+        driver = Driver('10.88.4.200', 502, 1)  # Nova instância para cada request
         print(f"Ligando LED {id_led}")
         driver.send_action_button(id_led, True)
         
@@ -39,7 +39,7 @@ async def turn_led(id_led: int):
         raise HTTPException(status_code=400, detail="Parâmetro 'id_led' não pode ser menor que 0")
     
     try:
-        driver = Driver('192.168.15.1', 502, 1)  # Nova instância para cada request
+        driver = Driver('10.88.4.200', 502, 1)  # Nova instância para cada request
                 
         print(f"Desligando LED {id_led}")
         driver.send_action_button(id_led, False)
@@ -58,7 +58,7 @@ async def turn_led(id_led: int):
         raise HTTPException(status_code=400, detail="Parâmetro 'id_led' não pode ser menor que 0")
     
     try:
-        driver = Driver('192.168.15.1', 502, 1)  # Nova instância para cada request
+        driver = Driver('10.88.4.200', 502, 1)  # Nova instância para cada request
                 
         print(f"Desligando LED {id_led}")
         dados = driver.read_coil(id_led)
@@ -78,4 +78,4 @@ def hello(request: Request):
     return {'message': 'hello'}
 
 if __name__ == '__main__':
-    uvicorn.run(app, host='192.168.64.241', port=8000)
+    uvicorn.run(app, host='192.168.88.242', port=8000)
